@@ -39,7 +39,7 @@ class BuildMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = Colors.white;
     return ListTile(
-      leading: Icon(Icons.home, color: color),
+      leading: Icon(icon, color: color),
       title: Text(text, style: TextStyle(color: color)),
       onTap: () {
         Navigator.pushNamed(context, screenid);

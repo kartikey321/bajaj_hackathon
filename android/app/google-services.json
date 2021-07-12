@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:403595502766:android:c4107332510aa19718393f",
+        "mobilesdk_app_id": "1:403595502766:android:37afe7215b3bbf0518393f",
         "android_client_info": {
           "package_name": "com.example.krishi_sahayak"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "403595502766-j9qso6ael3lo9j7ghem6blgp2quri703.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.krishi_sahayak",
+            "certificate_hash": "af6ce1b4ff765b0ecb683a49dc77b47b3731e1ff"
+          }
+        },
         {
           "client_id": "403595502766-kvl4e5kdfgr2noi8ds1ljjpm95gg0cgn.apps.googleusercontent.com",
           "client_type": 1,
