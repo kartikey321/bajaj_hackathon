@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:krishi_sahayak/components/loading.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 
 import 'homeScreen.dart';
@@ -26,6 +27,7 @@ class _OtpScreenState extends State<OtpScreen> {
   final _pinPutController = TextEditingController();
   final _pinPutFocusNode = FocusNode();
   var name;
+  bool showSpinner = false;
   final BoxDecoration pinPutDecoration = BoxDecoration(
     color: const Color.fromRGBO(43, 46, 66, 1),
     borderRadius: BorderRadius.circular(10.0),
@@ -73,71 +75,81 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFF8FFF5),
-      body: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 40.0),
-            child: Center(
-              child: Text(
-                'Verify +91 ${widget.phoneno}',
-                style: GoogleFonts.poppins(
-                  color: Color(0xFF70AF85),
-                  fontStyle: FontStyle.normal,
-                  textStyle: TextStyle(
-                    fontSize: 22.0,
+    return showSpinner
+        ? Loading()
+        : Scaffold(
+            backgroundColor: Color(0xFFF8FFF5),
+            body: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 40.0),
+                  child: Center(
+                    child: Text(
+                      'Verify +91 ${widget.phoneno}',
+                      style: GoogleFonts.poppins(
+                        color: Color(0xFF70AF85),
+                        fontStyle: FontStyle.normal,
+                        textStyle: TextStyle(
+                          fontSize: 22.0,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: PinPut(
-              fieldsCount: 6,
-              withCursor: true,
-              textStyle: const TextStyle(fontSize: 25.0, color: Colors.white),
-              eachFieldWidth: 40.0,
-              eachFieldHeight: 55.0,
-              onSubmit: (pin) async {
-                try {
-                  print(pin);
-                  await FirebaseAuth.instance
-                      .signInWithCredential(PhoneAuthProvider.credential(
-                          verificationId: _verificationCode, smsCode: pin))
-                      .then((value) async {
-                    print('value:  $value');
-                    if (value.user != null) {
-                      if (name != null) {
-                        print('before otp ${name}');
+                Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: PinPut(
+                    fieldsCount: 6,
+                    withCursor: true,
+                    textStyle:
+                        const TextStyle(fontSize: 25.0, color: Colors.white),
+                    eachFieldWidth: 40.0,
+                    eachFieldHeight: 55.0,
+                    onSubmit: (pin) async {
+                      setState(() {
+                        showSpinner = true;
+                      });
+                      try {
+                        print(pin);
+                        await FirebaseAuth.instance
+                            .signInWithCredential(PhoneAuthProvider.credential(
+                                verificationId: _verificationCode,
+                                smsCode: pin))
+                            .then((value) async {
+                          print('value:  $value');
+                          if (value.user != null) {
+                            if (name != null) {
+                              print('before otp ${name}');
 
-                        await _firestore
-                            .collection('users')
-                            .doc(_auth.currentUser!.uid)
-                            .set({
-                          'name': name,
-                          'phoneNo': '+91${widget.phoneno}',
-                        }, SetOptions(merge: true));
+                              await _firestore
+                                  .collection('users')
+                                  .doc(_auth.currentUser!.uid)
+                                  .set({
+                                'name': name,
+                                'phoneNo': '+91${widget.phoneno}',
+                              }, SetOptions(merge: true));
+                            }
+                            Navigator.pushNamedAndRemoveUntil(context,
+                                HomeScreen.id, (Route<dynamic> route) => false);
+                            setState(() {
+                              showSpinner = false;
+                            });
+                          }
+                        });
+                      } catch (e) {
+                        FocusScope.of(context).unfocus();
                       }
-                      Navigator.pushNamedAndRemoveUntil(context, HomeScreen.id,
-                          (Route<dynamic> route) => false);
-                    }
-                  });
-                } catch (e) {
-                  FocusScope.of(context).unfocus();
-                }
-              },
-              focusNode: _pinPutFocusNode,
-              controller: _pinPutController,
-              submittedFieldDecoration: pinPutDecoration,
-              selectedFieldDecoration: pinPutDecoration,
-              followingFieldDecoration: pinPutDecoration,
-              pinAnimationType: PinAnimationType.fade,
+                    },
+                    focusNode: _pinPutFocusNode,
+                    controller: _pinPutController,
+                    submittedFieldDecoration: pinPutDecoration,
+                    selectedFieldDecoration: pinPutDecoration,
+                    followingFieldDecoration: pinPutDecoration,
+                    pinAnimationType: PinAnimationType.fade,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 }

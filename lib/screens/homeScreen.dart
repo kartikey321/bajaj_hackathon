@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,20 +10,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:krishi_sahayak/components/drawer.dart';
 import 'package:krishi_sahayak/services/location.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:krishi_sahayak/components/customDialogBox.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../main.dart';
 import 'loginScreen.dart';
 
-final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print('A bg message just showed up :  ${message.messageId}');
-}
-
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
+  static AudioCache player = AudioCache();
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -43,6 +40,17 @@ class _HomeScreenState extends State<HomeScreen> {
       print(fcm_token);
       getLocation(fcm_token);
     });
+    AwesomeNotifications().initialize(null, [
+      NotificationChannel(
+        channelKey: 'key1',
+        channelName: 'Krishi-sahayak',
+        channelDescription: 'hello',
+        defaultColor: Color(0xFF7FCD91),
+        playSound: true,
+        soundSource: 'assets/sounds/note5.mp3',
+        enableVibration: true,
+      )
+    ]);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
@@ -105,6 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
         context, LoginScreen.id, (route) => false);
   }
 
+  playLocal() {
+    final player = AudioCache();
+
+    // call this method when desired
+    player.play('note4.wav');
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -147,11 +162,21 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(
               width: 25,
             ),
-            Container(
-              child: Image.asset(
-                'assets/images/warning.png',
-                fit: BoxFit.contain,
-                height: 32,
+            GestureDetector(
+              onTap: () {
+                // playLocal();
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CustomDialogBox();
+                    });
+              },
+              child: Container(
+                child: Image.asset(
+                  'assets/images/warning.png',
+                  fit: BoxFit.contain,
+                  height: 32,
+                ),
               ),
             ),
           ],
@@ -228,9 +253,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               ElevatedButton(
                   onPressed: () async {
-                    signout();
+                    notify();
                   },
-                  child: Text('Logout'))
+                  child: Text('Notif'))
             ],
           ),
         ),
@@ -279,4 +304,16 @@ class ReusableIcons extends StatelessWidget {
       ],
     );
   }
+}
+
+void notify() async {
+  await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+          id: 1,
+          channelKey: 'key1',
+          title: 'Notification Title',
+          body: 'Notification body',
+          bigPicture:
+              'https://9to5google.com/wp-content/uploads/sites/4/2021/04/Android-12-6.jpg?quality=82&strip=all',
+          notificationLayout: NotificationLayout.BigPicture));
 }

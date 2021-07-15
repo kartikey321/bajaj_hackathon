@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -95,11 +96,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(
                         height: 55.0,
                       ),
-                      Text(
-                        'Name:',
-                        style: GoogleFonts.poppins(
-                          fontStyle: FontStyle.normal,
-                          textStyle: TextStyle(fontSize: 25.0),
+                      Container(
+                        margin:
+                            EdgeInsets.only(right: 0.5 * width, bottom: 10.0),
+                        child: Text(
+                          'Name:',
+                          style: GoogleFonts.poppins(
+                            fontStyle: FontStyle.normal,
+                            textStyle: TextStyle(fontSize: 25.0),
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -120,28 +125,50 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(
                         height: 30,
                       ),
-                      Text(
-                        'Phone.No:',
-                        style: GoogleFonts.poppins(
-                          fontStyle: FontStyle.normal,
-                          textStyle: TextStyle(fontSize: 25.0),
+                      Container(
+                        margin: EdgeInsets.only(
+                          right: 0.45 * width,
+                        ),
+                        child: Text(
+                          'Phone.No:',
+                          style: GoogleFonts.poppins(
+                            fontStyle: FontStyle.normal,
+                            textStyle: TextStyle(fontSize: 25.0),
+                          ),
                         ),
                       ),
                       SizedBox(
-                        width: .8 * width,
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          //controller: _phoneNoController,
-                          onChanged: (value) {
-                            phoneno = value;
+                        height: 25.0,
+                      ),
+                      SizedBox(
+                        width: 0.85 * width,
+                        child: Row(
+                          children: [
+                            Flexible(
+                                flex: 1,
+                                child: Container(
+                                  child: CountryCodePicker(
+                                    initialSelection: 'IN',
+                                    enabled: false,
+                                    alignLeft: true,
+                                  ),
+                                )),
+                            Flexible(
+                              flex: 2,
+                              child: TextField(
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                onChanged: (value) {
+                                  phoneno = value;
 
-                            print(phoneno);
-                          },
-                          decoration: kTextFieldDecoration.copyWith(
-                            prefixText: '+91',
-                            hintText: 'Enter your phone no',
-                          ),
+                                  //print(phoneno);
+                                },
+                                decoration: kTextFieldDecoration.copyWith(
+                                  hintText: 'Enter your phone no',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(

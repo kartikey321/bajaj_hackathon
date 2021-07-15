@@ -73,110 +73,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 150.0,
-              height: 150.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(
-                  0xFF9DDAAA,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 50),
+                width: 150.0,
+                height: 150.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(
+                    0xFF9DDAAA,
+                  ),
+                ),
+                child: SvgPicture.asset(
+                  'assets/svgs/profile.svg',
+                  height: 150.0,
+                  width: 150.0,
                 ),
               ),
-              child: SvgPicture.asset(
-                'assets/svgs/profile.svg',
-                height: 150.0,
-                width: 150.0,
+              SizedBox(
+                height: 55.0,
               ),
-            ),
-            SizedBox(
-              height: 55.0,
-            ),
-            Container(
-              padding: EdgeInsets.all(12.0),
-              width: 0.8 * width,
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(12.0),
-                  color: Color(0xFFF8FFF5),
-                  border: Border.all(
-                    color: Color(0xFF7FCD91),
-                    width: 1,
-                  )),
-              child: Row(
-                children: [
-                  Text(
-                    'Name:',
-                    style: GoogleFonts.poppins(
-                      fontStyle: FontStyle.normal,
-                      textStyle: TextStyle(
-                        fontSize: 18.0,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  FutureBuilder(
-                    future: _fetch(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.done)
-                        return Text('Loading data... Please wait');
-                      return Text(
-                        name,
-                        style: GoogleFonts.poppins(
-                          fontStyle: FontStyle.normal,
-                          textStyle: TextStyle(
-                            color: Color(0xFF7FCD91),
-                            fontSize: 18.0,
-                          ),
+              Container(
+                padding: EdgeInsets.all(12.0),
+                width: 0.8 * width,
+                decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: Color(0xFFF8FFF5),
+                    border: Border.all(
+                      color: Color(0xFF7FCD91),
+                      width: 1,
+                    )),
+                child: Row(
+                  children: [
+                    Text(
+                      'Name:',
+                      style: GoogleFonts.poppins(
+                        fontStyle: FontStyle.normal,
+                        textStyle: TextStyle(
+                          fontSize: 18.0,
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 25.0,
-            ),
-            Container(
-              padding: EdgeInsets.all(12.0),
-              width: 0.8 * width,
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(12.0),
-                  color: Color(0xFFF8FFF5),
-                  border: Border.all(
-                    color: Color(0xFF7FCD91),
-                    width: 1,
-                  )),
-              child: Row(
-                children: [
-                  Text(
-                    'Location:',
-                    style: GoogleFonts.poppins(
-                      fontStyle: FontStyle.normal,
-                      textStyle: TextStyle(
-                        fontSize: 18.0,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  FutureBuilder(
-                    future: _fetch(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.done)
-                        return Text('Loading data... Please wait');
-                      return Flexible(
-                        child: Text(
-                          _currentAddress,
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    FutureBuilder(
+                      future: _fetch(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done)
+                          return Text('Loading data... Please wait');
+                        return Text(
+                          name,
                           style: GoogleFonts.poppins(
                             fontStyle: FontStyle.normal,
                             textStyle: TextStyle(
@@ -184,62 +137,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontSize: 18.0,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: 25.0,
-            ),
-            Container(
-              padding: EdgeInsets.all(12.0),
-              width: 0.8 * width,
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(12.0),
-                  color: Color(0xFFF8FFF5),
-                  border: Border.all(
-                    color: Color(0xFF7FCD91),
-                    width: 1,
-                  )),
-              child: Row(
-                children: [
-                  Text(
-                    'PhoneNo:',
-                    style: GoogleFonts.poppins(
-                      fontStyle: FontStyle.normal,
-                      textStyle: TextStyle(
-                        fontSize: 18.0,
+              SizedBox(
+                height: 25.0,
+              ),
+              Container(
+                padding: EdgeInsets.all(12.0),
+                width: 0.8 * width,
+                decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: Color(0xFFF8FFF5),
+                    border: Border.all(
+                      color: Color(0xFF7FCD91),
+                      width: 1,
+                    )),
+                child: Row(
+                  children: [
+                    Text(
+                      'Location:',
+                      style: GoogleFonts.poppins(
+                        fontStyle: FontStyle.normal,
+                        textStyle: TextStyle(
+                          fontSize: 18.0,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 10.0,
-                  ),
-                  FutureBuilder(
-                    future: _fetch(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.done)
-                        return Text('Loading data... Please wait');
-                      return Text(
-                        phoneNo,
-                        style: GoogleFonts.poppins(
-                          fontStyle: FontStyle.normal,
-                          textStyle: TextStyle(
-                            color: Color(0xFF7FCD91),
-                            fontSize: 18.0,
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    FutureBuilder(
+                      future: _fetch(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done)
+                          return Text('Loading data... Please wait');
+                        return Flexible(
+                          child: Text(
+                            _currentAddress,
+                            style: GoogleFonts.poppins(
+                              fontStyle: FontStyle.normal,
+                              textStyle: TextStyle(
+                                color: Color(0xFF7FCD91),
+                                fontSize: 18.0,
+                              ),
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(
+                height: 25.0,
+              ),
+              Container(
+                padding: EdgeInsets.all(12.0),
+                width: 0.8 * width,
+                decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: Color(0xFFF8FFF5),
+                    border: Border.all(
+                      color: Color(0xFF7FCD91),
+                      width: 1,
+                    )),
+                child: Row(
+                  children: [
+                    Text(
+                      'PhoneNo:',
+                      style: GoogleFonts.poppins(
+                        fontStyle: FontStyle.normal,
+                        textStyle: TextStyle(
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    FutureBuilder(
+                      future: _fetch(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done)
+                          return Text('Loading data... Please wait');
+                        return Text(
+                          phoneNo,
+                          style: GoogleFonts.poppins(
+                            fontStyle: FontStyle.normal,
+                            textStyle: TextStyle(
+                              color: Color(0xFF7FCD91),
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 80,
+              ),
+              Container(
+                  margin: EdgeInsets.fromLTRB(20, 0, 0.37 * width, 20),
+                  child: Image.asset(
+                    'assets/images/tractor.png',
+                    height: 260,
+                    width: 260,
+                  )),
+            ],
+          ),
         ),
       ),
     );
