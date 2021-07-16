@@ -1,8 +1,10 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:krishi_sahayak/screens/signupScreen.dart';
 
@@ -22,11 +24,13 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+final FlutterTts flutterTts = FlutterTts();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  speak();
   await Firebase.initializeApp();
   print('A bg message just showed up :  ${message.messageId}');
   print('Notification is ${message.data}');
-  notify();
+  //notify();
   AwesomeNotifications().createNotificationFromJsonData(message.data);
 }
 
@@ -102,4 +106,16 @@ void notify() async {
           bigPicture:
               'https://9to5google.com/wp-content/uploads/sites/4/2021/04/Android-12-6.jpg?quality=82&strip=all',
           notificationLayout: NotificationLayout.BigPicture));
+}
+
+playLocal() {
+  final player = AudioCache();
+
+  // call this method when desired
+  player.play('note4.wav');
+}
+
+Future speak() async {
+  await flutterTts.setLanguage("hi-IN");
+  await flutterTts.speak("आपकी फसलों को पानी चाहिए");
 }

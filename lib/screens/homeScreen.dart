@@ -40,19 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
       print(fcm_token);
       getLocation(fcm_token);
     });
-    AwesomeNotifications().initialize(null, [
-      NotificationChannel(
-        channelKey: 'key1',
-        channelName: 'Krishi-sahayak',
-        channelDescription: 'hello',
-        defaultColor: Color(0xFF7FCD91),
-        playSound: true,
-        soundSource: 'assets/sounds/note5.mp3',
-        enableVibration: true,
-      )
-    ]);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      speak();
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -118,6 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // call this method when desired
     player.play('note4.wav');
+  }
+
+  Future speak() async {
+    await flutterTts.setLanguage("hi-IN");
+    await flutterTts.speak("आपकी फसलों को पानी चाहिए");
   }
 
   @override
@@ -307,6 +302,17 @@ class ReusableIcons extends StatelessWidget {
 }
 
 void notify() async {
+  AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'key1',
+      channelName: 'Krishi-sahayak',
+      channelDescription: 'hello',
+      defaultColor: Color(0xFF7FCD91),
+      playSound: true,
+      soundSource: 'assets/sounds/note5.mp3',
+      enableVibration: true,
+    )
+  ]);
   await AwesomeNotifications().createNotification(
       content: NotificationContent(
           id: 1,
