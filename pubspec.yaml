@@ -44,12 +44,13 @@ dependencies:
   google_fonts: ^2.1.0
   image_cropper: ^1.4.1
   image_picker: ^0.8.2
+  onboarding_screen: ^0.0.3
   permission_handler: ^8.1.2
   pinput: ^1.2.0
   shared_preferences: ^2.0.6
   socket_io_client: ^2.0.0-beta.4-nullsafety.0
-  web_socket_channel: ^2.1.0
   translator: ^0.1.7
+  web_socket_channel: ^2.1.0
 
 dev_dependencies:
   flutter_test:

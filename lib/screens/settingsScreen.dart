@@ -16,12 +16,30 @@ class SettingsScreen extends StatefulWidget {
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-bool isNotifOn = true;
+bool? isNotifOn;
 
 class _SettingsScreenState extends State<SettingsScreen> {
   Language selectedLanguage = Language.English;
+  initvar() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isNotifOn = prefs.getBool('notifState');
+    var lan = prefs.getString('lang');
+    print(lan);
+    lan == 'en-In'
+        ? selectedLanguage = Language.English
+        : selectedLanguage = Language.Hindi;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initvar();
+  }
+
   @override
   Widget build(BuildContext context) {
+    initvar();
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -93,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Container(
                     height: 60.0,
                     child: Switch(
-                      value: isNotifOn,
+                      value: isNotifOn != null ? isNotifOn! : true,
                       onChanged: (value) {
                         setState(() {
                           isNotifOn = value;
@@ -178,7 +196,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             },
                             child: Container(
                               child: SvgPicture.asset(
-                                selectedLanguage == Language.English
+                                selectedLanguage == Language.English ||
+                                        selectedLanguage == null
                                     ? 'assets/svgs/english_select.svg'
                                     : 'assets/svgs/english.svg',
                               ),

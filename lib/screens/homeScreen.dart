@@ -16,6 +16,7 @@ import 'package:krishi_sahayak/components/customDialogBox.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:krishi_sahayak/globalStates.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:translator/translator.dart';
 
@@ -58,10 +59,26 @@ class _HomeScreenState extends State<HomeScreen> {
       getLocation(fcm_token);
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      Timer(Duration(seconds: 2), () {
-        speak(body: message.notification!.body);
-      });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var n = prefs.getBool('notifState');
+      var lang = prefs.getString('lang');
+      if (n == true) {
+        if (lang == 'hi-IN') {
+          final translator = GoogleTranslator();
+          var body1 = message.notification!.body;
+          Translation translation =
+              await translator.translate(body1!.toString(), to: 'hi');
+          print(translation.toString().runtimeType);
+          Timer(Duration(seconds: 2), () {
+            speak(body: translation.toString());
+          });
+        } else if (lang == 'en-IN') {
+          Timer(Duration(seconds: 2), () {
+            speak(body: message.notification!.body);
+          });
+        }
+      }
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -91,11 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (_) {
               return AlertDialog(
-                title: Text(notification!.title.toString()),
+                title: Text(notification.title.toString()),
                 content: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text(notification!.body.toString())],
+                    children: [Text(notification.body.toString())],
                   ),
                 ),
               );
@@ -130,7 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future speak({body}) async {
-    await flutterTts.setLanguage("hi-IN");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lang = prefs.getString('lang');
+    await flutterTts.setLanguage(lang!);
+
     await flutterTts.speak(body);
   }
 

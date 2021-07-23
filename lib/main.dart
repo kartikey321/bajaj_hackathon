@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:krishi_sahayak/screens/OnboardingScreen.dart';
 import 'package:krishi_sahayak/screens/pestControlScreen.dart';
 import 'package:krishi_sahayak/screens/settingsScreen.dart';
 import 'package:krishi_sahayak/screens/signupScreen.dart';
@@ -108,7 +109,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreen(),
+      home: OnboardingScreen(),
       routes: {
         LoginScreen.id: (context) => LoginScreen(),
         SignupScreen.id: (context) => SignupScreen(),
@@ -118,6 +119,7 @@ class MyApp extends StatelessWidget {
         SettingsScreen.id: (context) => SettingsScreen(),
         PestControlScreen.id: (context) => PestControlScreen(),
         SplashScreen.id: (context) => SplashScreen(),
+        OnboardingScreen.id: (context) => OnboardingScreen(),
       },
     );
   }
