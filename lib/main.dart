@@ -35,6 +35,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var n = prefs.getBool('notifState');
   var lang = prefs.getString('lang');
+
   if (n == true) {
     if (lang == 'hi-IN') {
       final translator = GoogleTranslator();
@@ -59,8 +60,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   //AwesomeNotifications().createNotificationFromJsonData(message.data);
 }
 
+bool? initScreen;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  initScreen = await prefs.getBool('initScreen');
+  await prefs.setBool('initScreen', true);
   AwesomeNotifications().initialize(null, [
     NotificationChannel(
       channelKey: 'key1',
@@ -109,7 +114,9 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: OnboardingScreen(),
+      home: initScreen! || initScreen == null
+          ? OnboardingScreen()
+          : LoginScreen(),
       routes: {
         LoginScreen.id: (context) => LoginScreen(),
         SignupScreen.id: (context) => SignupScreen(),

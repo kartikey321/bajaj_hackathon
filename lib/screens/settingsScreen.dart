@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,12 +7,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'loginScreen.dart';
+
 enum Language { English, Hindi }
 
 class SettingsScreen extends StatefulWidget {
   static String id = 'settings_screen';
-
-  const SettingsScreen({Key? key}) : super(key: key);
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
@@ -30,12 +33,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         : selectedLanguage = Language.Hindi;
   }
 
+  Future<void> signout() async {
+    await _auth.signOut();
+    Navigator.pushNamedAndRemoveUntil(
+        context, LoginScreen.id, (route) => false);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     initvar();
   }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -233,19 +244,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(
               height: 38.0,
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: Colors.red),
-              ),
-              child: Text(
-                'Log Out',
-                style: GoogleFonts.poppins(
-                  fontStyle: FontStyle.normal,
-                  textStyle: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.red,
+            GestureDetector(
+              onTap: () async {
+                await _auth.signOut();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, LoginScreen.id, (route) => false);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(color: Colors.red),
+                ),
+                child: Text(
+                  'Log Out',
+                  style: GoogleFonts.poppins(
+                    fontStyle: FontStyle.normal,
+                    textStyle: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.red,
+                    ),
                   ),
                 ),
               ),
