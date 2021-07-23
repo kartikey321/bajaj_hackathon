@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:krishi_sahayak/components/drawer.dart';
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 final FirebaseAuth _auth = FirebaseAuth.instance;
+final ImagePicker _picker = ImagePicker();
+final FirebaseStorage _storage = FirebaseStorage.instance;
 
 class ProfileScreen extends StatefulWidget {
   static String id = 'profile_screen';
@@ -25,17 +31,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late double latitude;
   late double longitude;
   late String address;
+  XFile? image1;
+  File? image2;
+  String? url2;
+  Future<void> getinfo() async {
+    await getProfileImage();
+    await _fetch().whenComplete(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    getinfo();
+    super.initState();
+  }
+
+  void _showPicker(context) {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          Future<void> _pickImage(ImageSource source) async {
+            final image = await _picker.pickImage(
+                source: source, maxWidth: 150.0, maxHeight: 150.0);
+            if (image != null) {
+              await _storage
+                  .ref('profileImages/${_auth.currentUser!.uid}')
+                  .putFile(File(image.path));
+
+              final url = await _storage
+                  .ref('profileImages/${_auth.currentUser!.uid}')
+                  .getDownloadURL();
+
+              setState(() {
+                url2 = url;
+              });
+
+              // e.g, e.code == 'canceled'
+            }
+          }
+
+          return SafeArea(
+            child: Container(
+              child: new Wrap(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.photo_library),
+                    title: Text('From Gallery'),
+                    onTap: () {
+                      _pickImage(ImageSource.gallery);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text('Camera'),
+                    onTap: () {
+                      _pickImage(ImageSource.camera);
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
-    @override
-    void initState() {
-      _fetch().whenComplete(() {
-        setState(() {});
-      });
-      super.initState();
-    }
 
     return Scaffold(
       backgroundColor: Color(0xFFF8FFF5),
@@ -79,20 +144,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                margin: EdgeInsets.only(top: 50),
-                width: 150.0,
-                height: 150.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(
-                    0xFF9DDAAA,
-                  ),
-                ),
-                child: SvgPicture.asset(
-                  'assets/svgs/profile.svg',
-                  height: 150.0,
+              GestureDetector(
+                onTap: () {
+                  _showPicker(context);
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: 50),
                   width: 150.0,
+                  height: 150.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(
+                      0xFF9DDAAA,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(75),
+                    // child: FutureBuilder(
+                    //   future: getProfileImage(),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState != ConnectionState.done)
+                    //       return SvgPicture.asset(
+                    //         'assets/svgs/profile.svg',
+                    //         height: 150.0,
+                    //         width: 150.0,
+                    //       );
+
+                    //     return Image.file(
+                    //       image2!,
+                    //       fit: BoxFit.cover,
+                    //     );
+                    //   },
+                    // ),
+                    child: url2 != null
+                        ? Image.network(url2!)
+                        : SvgPicture.asset(
+                            'assets/svgs/profile.svg',
+                            height: 150.0,
+                            width: 150.0,
+                          ),
+                  ),
                 ),
               ),
               SizedBox(
@@ -286,5 +377,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _getAddressFromLatLng(latitude, longitude);
       });
     }
+  }
+
+  Future<void> getProfileImage() async {
+    File? img;
+    final url = await _storage
+        .ref('profileImages/${_auth.currentUser!.uid}')
+        .getDownloadURL();
+    url2 = url;
+    image2 = img;
   }
 }

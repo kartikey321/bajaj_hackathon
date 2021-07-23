@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,9 +15,12 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:krishi_sahayak/components/customDialogBox.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:krishi_sahayak/globalStates.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../main.dart';
 import 'loginScreen.dart';
+import 'pestControlScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -26,15 +31,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GlobalStates globalStates = GlobalStates();
   late FirebaseMessaging messaging;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late String uid;
   late Position position;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((fcm_token) {
       print(fcm_token);
@@ -42,7 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      speak();
+      Timer(Duration(seconds: 2), () {
+        speak(body: message.notification!.body);
+      });
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -72,11 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (_) {
               return AlertDialog(
-                title: Text('notification.title'),
+                title: Text(notification!.title.toString()),
                 content: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text('notification.body')],
+                    children: [Text(notification!.body.toString())],
                   ),
                 ),
               );
@@ -110,9 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
     player.play('note4.wav');
   }
 
-  Future speak() async {
+  Future speak({body}) async {
     await flutterTts.setLanguage("hi-IN");
-    await flutterTts.speak("आपकी फसलों को पानी चाहिए");
+    await flutterTts.speak(body);
   }
 
   @override
@@ -194,9 +204,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ReusableIcons(
-                    svgno: 22,
-                    text: 'Pest Control',
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, PestControlScreen.id);
+                    },
+                    child: ReusableIcons(
+                      svgno: 22,
+                      text: 'Pest Control',
+                    ),
                   ),
                   SizedBox(
                     width: 50.0,
@@ -213,9 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ReusableIcons(
-                    svgno: 24,
-                    text: 'Soil Temperature',
+                  GestureDetector(
+                    onTap: () {},
+                    child: ReusableIcons(
+                      svgno: 24,
+                      text: 'Soil Temperature',
+                    ),
                   ),
                   SizedBox(
                     width: 50.0,
@@ -246,11 +264,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    notify();
-                  },
-                  child: Text('Notif'))
+              // ElevatedButton(
+              //     onPressed: () {
+
+              //     },
+              //     child: Text())
             ],
           ),
         ),

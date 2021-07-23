@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,10 +7,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
+import 'package:krishi_sahayak/screens/pestControlScreen.dart';
+import 'package:krishi_sahayak/screens/settingsScreen.dart';
 import 'package:krishi_sahayak/screens/signupScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:translator/translator.dart';
 
-import 'screens/OTPScreen.dart';
 import 'screens/aboutScreen.dart';
 import 'screens/homeScreen.dart';
 import 'screens/loginScreen.dart';
@@ -26,12 +30,31 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 final FlutterTts flutterTts = FlutterTts();
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  speak();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var n = prefs.getBool('notifState');
+  var lang = prefs.getString('lang');
+  if (n != 0) {
+    if (lang == 'hi-IN') {
+      final translator = GoogleTranslator();
+      var body1 = message.notification!.body;
+      String translation =
+          (await translator.translate(body1!, to: 'hi')) as String;
+      print(translation);
+      Timer(Duration(seconds: 1), () {
+        speak(body: translation);
+      });
+    } else {
+      Timer(Duration(seconds: 1), () {
+        speak(body: message.notification!.body);
+      });
+    }
+  }
+
   await Firebase.initializeApp();
   print('A bg message just showed up :  ${message.messageId}');
-  print('Notification is ${message.data}');
+  print('Notification is ${message.notification!.title}');
   //notify();
-  AwesomeNotifications().createNotificationFromJsonData(message.data);
+  //AwesomeNotifications().createNotificationFromJsonData(message.data);
 }
 
 void main() async {
@@ -91,6 +114,8 @@ class MyApp extends StatelessWidget {
         HomeScreen.id: (context) => HomeScreen(),
         ProfileScreen.id: (context) => ProfileScreen(),
         AboutScreen.id: (context) => AboutScreen(),
+        SettingsScreen.id: (context) => SettingsScreen(),
+        PestControlScreen.id: (context) => PestControlScreen(),
       },
     );
   }
@@ -115,7 +140,11 @@ playLocal() {
   player.play('note4.wav');
 }
 
-Future speak() async {
-  await flutterTts.setLanguage("hi-IN");
-  await flutterTts.speak("आपकी फसलों को पानी चाहिए");
+Future speak({body}) async {
+  final translator = GoogleTranslator();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? lang = prefs.getString('lang');
+  await flutterTts.setLanguage(lang!);
+
+  await flutterTts.speak(body);
 }

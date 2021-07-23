@@ -6,6 +6,7 @@ import 'package:krishi_sahayak/screens/homeScreen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:krishi_sahayak/screens/loginScreen.dart';
 import 'package:krishi_sahayak/screens/profileScreen.dart';
+import 'package:krishi_sahayak/screens/settingsScreen.dart';
 
 var Drawer1 = Drawer(
   child: Container(
@@ -30,6 +31,10 @@ var Drawer1 = Drawer(
           icon: FontAwesomeIcons.info,
           screenid: AboutScreen.id,
         ),
+        BuildMenuItem(
+            text: 'Settings',
+            icon: FontAwesomeIcons.tools,
+            screenid: SettingsScreen.id),
         Logout(),
 
         //buildMenuItem(text: 'Home', icon: Icons.home),
