@@ -56,7 +56,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF7FCD91),
-        leading: Icon(FontAwesomeIcons.arrowLeft),
+        leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(FontAwesomeIcons.arrowLeft)),
         title: Text(
           'Settings',
           style: GoogleFonts.poppins(

@@ -114,9 +114,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: initScreen! || initScreen == null
-          ? OnboardingScreen()
-          : LoginScreen(),
+      home: OnboardingScreen(),
       routes: {
         LoginScreen.id: (context) => LoginScreen(),
         SignupScreen.id: (context) => SignupScreen(),

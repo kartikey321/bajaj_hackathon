@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:krishi_sahayak/screens/homeScreen.dart';
 import 'package:krishi_sahayak/screens/loginScreen.dart';
+import 'package:krishi_sahayak/screens/signupScreen.dart';
 import 'package:onboarding_screen/onboarding_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -76,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => LoginScreen(),
+            builder: (_) => SignupScreen(),
           ),
         );
       },
