@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -205,6 +206,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   await SharedPreferences.getInstance();
 
                               prefs.setString('lang', 'en-IN');
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .set({'language': 'english'},
+                                      SetOptions(merge: true));
+                              await FirebaseMessaging.instance
+                                  .subscribeToTopic('english');
                               setState(() {
                                 selectedLanguage = Language.English;
                               });
@@ -226,6 +234,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               prefs.setString('lang', 'hi-IN');
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .set({'language': 'hindi'},
+                                      SetOptions(merge: true));
+                              await FirebaseMessaging.instance
+                                  .unsubscribeFromTopic('english');
+                              await FirebaseMessaging.instance
+                                  .subscribeToTopic('hindi');
                               setState(() {
                                 selectedLanguage = Language.Hindi;
                               });

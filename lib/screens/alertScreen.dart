@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +15,8 @@ class AlertScreen extends StatefulWidget {
 }
 
 class _AlertScreenState extends State<AlertScreen> {
+  final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -55,19 +59,50 @@ class _AlertScreenState extends State<AlertScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(height: 30),
-              AlertItem(width: width),
-              AlertItem(width: width),
-              AlertItem(width: width),
-              AlertItem(width: width),
-              AlertItem(width: width),
-            ],
-          ),
-        ),
+      body: StreamBuilder(
+        stream: _firestore
+            .collection('alertnotif')
+            .doc(_auth.currentUser!.uid)
+            .collection('userAlerts1')
+            .orderBy('date', descending: true)
+            .limit(50)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: Text("Loading"));
+          }
+
+          return ListView(
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+              print('listview $data');
+              return ListTileItem(data: data);
+            }).toList(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ListTileItem extends StatelessWidget {
+  const ListTileItem({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
+
+  final Map<String, dynamic> data;
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: new Text(data['body']),
+      subtitle: Text(
+        data['date'].toDate().toString(),
       ),
     );
   }

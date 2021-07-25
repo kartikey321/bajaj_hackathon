@@ -47,6 +47,18 @@ class _HomeScreenState extends State<HomeScreen> {
     print(translation);
   }
 
+  uploadNotif(body) async {
+    await Firebase.initializeApp();
+    _firestore
+        .collection('alertnotif')
+        .doc(_auth.currentUser!.uid)
+        .collection('userAlerts1')
+        .add({
+      'body': body,
+      'date': DateTime.now(),
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -63,21 +75,25 @@ class _HomeScreenState extends State<HomeScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var n = prefs.getBool('notifState');
       var lang = prefs.getString('lang');
+      uploadNotif(message.notification!.body);
       if (n == true) {
-        if (lang == 'hi-IN') {
-          final translator = GoogleTranslator();
-          var body1 = message.notification!.body;
-          Translation translation =
-              await translator.translate(body1!.toString(), to: 'hi');
-          print(translation.toString().runtimeType);
-          Timer(Duration(seconds: 2), () {
-            speak(body: translation.toString());
-          });
-        } else if (lang == 'en-IN') {
-          Timer(Duration(seconds: 2), () {
-            speak(body: message.notification!.body);
-          });
-        }
+        // if (lang == 'hi-IN') {
+        //   final translator = GoogleTranslator();
+        //   var body1 = message.notification!.body;
+        //   Translation translation =
+        //       await translator.translate(body1!.toString(), to: 'hi');
+        //   print(translation.toString().runtimeType);
+        //   Timer(Duration(seconds: 2), () {
+        //     speak(body: translation.toString());
+        //   });
+        // } else if (lang == 'en-IN') {
+        //   Timer(Duration(seconds: 2), () {
+        //     speak(body: message.notification!.body);
+        //   });
+        // }
+        Timer(Duration(seconds: 2), () {
+          speak(body: message.notification!.body);
+        });
       }
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -240,14 +256,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ReusableIcons(
                       svgno: 22,
                       text: 'Pest Control',
+                      valueText: 'Locusts',
                     ),
                   ),
                   SizedBox(
-                    width: 50.0,
+                    width: 30.0,
                   ),
                   ReusableIcons(
                     svgno: 23,
                     text: 'Disease Control',
+                    valueText: 'Black Spot',
                   ),
                 ],
               ),
@@ -262,16 +280,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ReusableIcons(
                       svgno: 24,
                       text: 'Soil Temperature',
+                      valueText: '98°C',
                     ),
                   ),
                   SizedBox(
-                    width: 50.0,
+                    width: 0.0,
                   ),
                   Container(
                     margin: EdgeInsets.only(right: 35.0),
                     child: ReusableIcons(
                       svgno: 25,
                       text: 'Soil Moisture',
+                      valueText: '98%',
                     ),
                   ),
                 ],
@@ -320,30 +340,51 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class ReusableIcons extends StatelessWidget {
-  ReusableIcons({this.svgno, this.text});
+  ReusableIcons({this.svgno, this.text, this.valueText});
   final svgno;
   final text;
+  final valueText;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SvgPicture.asset(
-          'assets/svgs/Group ${svgno}.svg',
-          height: 100,
-          width: 100,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      width: 190.0,
+      decoration: BoxDecoration(
+        color: Color(0xFFEDFAEC),
+        borderRadius: BorderRadius.circular(13.0),
+        border: Border.all(
+          color: Color(0xFF229952),
         ),
-        Text(
-          text,
-          style: GoogleFonts.poppins(
-            fontStyle: FontStyle.normal,
-            textStyle: TextStyle(
-              fontSize: 18.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'assets/svgs/Group ${svgno}.svg',
+            height: 100,
+            width: 100,
+          ),
+          Text(
+            text,
+            style: GoogleFonts.poppins(
+              fontStyle: FontStyle.normal,
+              textStyle: TextStyle(
+                fontSize: 18.0,
+              ),
             ),
           ),
-        )
-      ],
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 3.0, vertical: 6.0),
+            decoration: BoxDecoration(
+              color: Color(0xFFC6EBC9),
+              border: Border.all(width: 0.5),
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: Text(valueText),
+          )
+        ],
+      ),
     );
   }
 }

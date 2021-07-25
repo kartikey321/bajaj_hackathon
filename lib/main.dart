@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +23,14 @@ import 'screens/loginScreen.dart';
 import 'screens/profileScreen.dart';
 import 'screens/signupScreen.dart';
 
+final _firestore = FirebaseFirestore.instance;
+final _auth = FirebaseAuth.instance;
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
     'This channel is used for important notifications.', // description
     importance: Importance.high,
+    sound: RawResourceAndroidNotificationSound('note5.mp3'),
     playSound: true);
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -36,21 +41,26 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   var n = prefs.getBool('notifState');
   var lang = prefs.getString('lang');
 
+  uploadNotif(message.notification!.body);
+
   if (n == true) {
-    if (lang == 'hi-IN') {
-      final translator = GoogleTranslator();
-      var body1 = message.notification!.body;
-      Translation translation =
-          await translator.translate(body1!.toString(), to: 'hi');
-      print(translation.toString().runtimeType);
-      Timer(Duration(seconds: 2), () {
-        speak(body: translation.toString());
-      });
-    } else if (lang == 'en-IN') {
-      Timer(Duration(seconds: 2), () {
-        speak(body: message.notification!.body);
-      });
-    }
+    // if (lang == 'hi-IN') {
+    //   final translator = GoogleTranslator();
+    //   var body1 = message.notification!.body;
+    //   Translation translation =
+    //       await translator.translate(body1!.toString(), to: 'hi');
+    //   print(translation.toString().runtimeType);
+    //   Timer(Duration(seconds: 2), () {
+    //     speak(body: translation.toString());
+    //   });
+    // } else if (lang == 'en-IN') {
+    //   Timer(Duration(seconds: 2), () {
+    //     speak(body: message.notification!.body);
+    //   });
+    // }
+    Timer(Duration(seconds: 2), () {
+      speak(body: message.notification!.body);
+    });
   }
 
   await Firebase.initializeApp();
@@ -58,6 +68,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Notification is ${message.notification!.title}');
   //notify();
   //AwesomeNotifications().createNotificationFromJsonData(message.data);
+}
+
+uploadNotif(body) async {
+  await Firebase.initializeApp();
+  _firestore
+      .collection('alertnotif')
+      .doc(_auth.currentUser!.uid)
+      .collection('userAlerts1')
+      .add({
+    'body': body,
+    'date': DateTime.now(),
+  });
 }
 
 bool? initScreen;
@@ -114,7 +136,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: OnboardingScreen(),
+      home: SplashScreen(),
       routes: {
         LoginScreen.id: (context) => LoginScreen(),
         SignupScreen.id: (context) => SignupScreen(),
